@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
+import { v4 } from "uuid";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiY2hpZ3VpcmVjb2RlIiwiYSI6ImNraXEyazBjNTBhYzUyc2xyb2kweno1eGcifQ.j8cpfzTNCCIdcDRXl5xz9w";
@@ -11,6 +12,10 @@ export const useMapbox = (puntoInicial) => {
     mapaDiv.current = node;
   }, []);
 
+  // Referencia a los marcadores
+  const marcadores = useRef({});
+
+  //Mapa y cordenadas
   const mapa = useRef();
   const [cordenadas, setCordenadas] = useState(puntoInicial);
 
@@ -27,7 +32,8 @@ export const useMapbox = (puntoInicial) => {
 
     var marker = new mapboxgl.Marker()
       .setLngLat([cordenadas.lng, cordenadas.lat])
-      .addTo(map);
+      .addTo(map)
+      .setDraggable(true);
 
     mapa.current = map;
   }, [puntoInicial]);
@@ -44,6 +50,20 @@ export const useMapbox = (puntoInicial) => {
     });
 
     // return mapa.current?.off("move");
+  }, []);
+
+  // Crear nuevo marcador
+  useEffect(() => {
+    mapa.current?.on("click", (ev) => {
+      const { lng, lat } = ev.lngLat;
+
+      const marker = new mapboxgl.Marker();
+      marker.id = v4();
+
+      marker.setLngLat([lng, lat]).addTo(mapa.current).setDraggable(true);
+
+      marcadores.current[marker.id] = marker;
+    });
   }, []);
 
   return {
