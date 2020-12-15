@@ -13,7 +13,7 @@ const puntoInicial = {
 export const MapaPage = () => {
   const mapaDiv = useRef();
 
-  const [mapa, setMapa] = useState();
+  const mapa = useRef();
   const [cordenadas, setCordenadas] = useState(puntoInicial);
 
   // Cargamos el mapa
@@ -31,24 +31,24 @@ export const MapaPage = () => {
       .setLngLat([cordenadas.lng, cordenadas.lat])
       .addTo(map);
 
-    setMapa(map);
+    mapa.current = map;
+
+    console.log(mapa.current);
   }, []);
 
   // Cuando se mueve el mapa
   useEffect(() => {
-    if (mapa !== undefined) {
-      mapa.on("move", () => {
-        const { lng, lat } = mapa.getCenter();
-        setCordenadas({
-          lng: lng.toFixed(4),
-          lat: lat.toFixed(4),
-          zoom: mapa.getZoom().toFixed(2),
-        });
+    mapa.current?.on("move", () => {
+      const { lng, lat } = mapa.current.getCenter();
+      setCordenadas({
+        lng: lng.toFixed(4),
+        lat: lat.toFixed(4),
+        zoom: mapa.current.getZoom().toFixed(2),
       });
+    });
 
-      // return mapa.off("move");
-    }
-  }, [mapa]);
+    // return mapa.current?.off("move");
+  }, []);
 
   return (
     <>
