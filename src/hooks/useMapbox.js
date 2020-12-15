@@ -29,6 +29,13 @@ export const useMapbox = (puntoInicial) => {
     marker.setLngLat([lng, lat]).addTo(mapa.current).setDraggable(true);
 
     marcadores.current[marker.id] = marker;
+
+    //Escuchar movimientos al marcador
+
+    marker.on("drag", (ev) => {
+      const { id } = ev.target;
+      const { lng, lat } = ev.target.getLngLat();
+    });
   }, []);
 
   // Cargamos el mapa
