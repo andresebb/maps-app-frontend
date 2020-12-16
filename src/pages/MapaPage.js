@@ -15,6 +15,7 @@ export const MapaPage = () => {
     nuevoMarcador$,
     movimientoMarcador$,
     agregarMarcador,
+    actualizarPosicion,
   } = useMapbox(puntoInicial);
 
   const { socket } = useContext(SocketContext);
@@ -28,7 +29,9 @@ export const MapaPage = () => {
 
   //Movimiento marcador datos
   useEffect(() => {
-    movimientoMarcador$.subscribe((marcador) => {});
+    movimientoMarcador$.subscribe((marcador) => {
+      socket.emit("marcador-actualizado", marcador);
+    });
   }, [movimientoMarcador$]);
 
   //Escuchar nuevos marcadores
@@ -48,6 +51,14 @@ export const MapaPage = () => {
       }
     });
   }, [socket, agregarMarcador]);
+
+  //Escuchar movimiento del marcador
+
+  useEffect(() => {
+    socket.on("marcador-actualizado", (marcador) => {
+      actualizarPosicion(marcador);
+    });
+  }, [socket, actualizarPosicion]);
 
   return (
     <>

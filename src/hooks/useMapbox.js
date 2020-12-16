@@ -59,6 +59,11 @@ export const useMapbox = (puntoInicial) => {
     });
   }, []);
 
+  //Actualizar la ubicacion del marcador
+  const actualizarPosicion = useCallback(({ id, lng, lat }) => {
+    marcadores.current[id].setLngLat([lng, lat]);
+  }, []);
+
   // Cargamos el mapa
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -80,7 +85,7 @@ export const useMapbox = (puntoInicial) => {
     mapa.current = map;
   }, [puntoInicial]);
 
-  // Cuando se mueve el mapa
+  // Cuando se mueve el mapa, obtener cordenadas
   useEffect(() => {
     mapa.current?.on("move", () => {
       const { lng, lat } = mapa.current.getCenter();
@@ -104,6 +109,7 @@ export const useMapbox = (puntoInicial) => {
     agregarMarcador,
     marcadores,
     setRef,
+    actualizarPosicion,
     nuevoMarcador$: nuevoMarcador.current,
     movimientoMarcador$: movimientoMarcador.current,
   };
