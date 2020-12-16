@@ -25,29 +25,32 @@ export const useMapbox = (puntoInicial) => {
   const [cordenadas, setCordenadas] = useState(puntoInicial);
 
   //Agregar marcadores
-  const agregarMarcador = useCallback((ev) => {
-    const { lng, lat } = ev.lngLat;
+  const agregarMarcador = useCallback((ev, id) => {
+    const { lng, lat } = ev.lngLat || ev;
 
     const marker = new mapboxgl.Marker();
-    marker.id = v4();
+    //Si el id no viene usa uuid.
+    marker.id = id ?? v4();
+
     marker.setLngLat([lng, lat]).addTo(mapa.current).setDraggable(true);
 
     //Asignamoes el objeto al marcador
     marcadores.current[marker.id] = marker;
 
-    //Si el marcador tiene id no emitir
-    nuevoMarcador.current.next({
-      id: marker.id,
-      lng,
-      lat,
-    });
+    //Si no viene el id no se emite el nuevoMarcador
+    if (!id) {
+      nuevoMarcador.current.next({
+        id: marker.id,
+        lng,
+        lat,
+      });
+    }
 
     //Escuchar movimientos al marcador
     marker.on("drag", (ev) => {
       const { id } = ev.target;
       const { lng, lat } = ev.target.getLngLat();
 
-      //
       movimientoMarcador.current.next({
         id,
         lng,
@@ -65,8 +68,10 @@ export const useMapbox = (puntoInicial) => {
       zoom: puntoInicial.zoom,
     });
 
+    //Zoom en el mapa
     map.addControl(new mapboxgl.NavigationControl());
 
+    // Marcador por defecto en el mapa
     var marker = new mapboxgl.Marker()
       .setLngLat([cordenadas.lng, cordenadas.lat])
       .addTo(map)
