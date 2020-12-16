@@ -1,10 +1,13 @@
 import React from "react";
+import { SocketProvider } from "./context/SocketContext";
 import { MapaPage } from "./pages/MapaPage";
 
 const mapApp = () => {
   return (
     <>
-      <MapaPage />
+      <SocketProvider>
+        <MapaPage />
+      </SocketProvider>
     </>
   );
 };
